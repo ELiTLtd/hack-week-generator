@@ -1,4 +1,4 @@
-(defproject ila-prototype "0.1.0-SNAPSHOT"
+(defproject ila-prototype "1.0.1-SNAPSHOT"
   :description "ila-project prototype project"
   :url "https://github.com/ELiTLtd/ila-prototype"
   :min-lein-version "2.0.0"
