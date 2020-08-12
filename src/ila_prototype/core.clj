@@ -5,7 +5,9 @@
             reitit.ring
             reitit.ring.coercion
             reitit.ring.middleware.muuntaja
-            [ring.adapter.jetty :as ring-jetty]))
+            [ring.adapter.jetty :as ring-jetty])
+  (:gen-class))
+
 
 (def sample-resource
   {:name :resources/sample
@@ -13,9 +15,16 @@
                     {:status 200
                      :body {:status "OK"}})}})
 
+(def healthcheck-resource
+  {:name :resources/healthcheck
+   :get {:handler (fn [_request]
+                    {:status 200
+                     :body {:status "OK"}})}})
+
 (def router
   (reitit.ring/router
-   [["/sample" sample-resource]]
+   [["/healthcheck" healthcheck-resource]
+    ["/sample" sample-resource]]
    {:data {:muuntaja muuntaja.core/instance
            :middleware [reitit.ring.middleware.muuntaja/format-middleware
                         reitit.ring.coercion/coerce-exceptions-middleware
@@ -43,9 +52,11 @@
 
 (defn -main
   [& args]
-  (let [port (Integer/parseInt (get (System/getenv) "PORT" "3000"))]
+  (let [port (Integer/parseInt (get (System/getenv) "PORT" "9000"))]
     (.join (start-server port))))
 
 (comment
   ;; start the server from within an nrepl session
-  (start-server 3000))
+  (prn @server-instance)
+  (stop-server)
+  (start-server 9000))
