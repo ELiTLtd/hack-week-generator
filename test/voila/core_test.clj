@@ -1,6 +1,6 @@
-(ns ila-prototype.core-test
+(ns voila.core-test
   (:require [clojure.test :refer :all]
-            [ila-prototype.core :refer :all]))
+            [voila.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."

@@ -1,4 +1,4 @@
-# ila-prototype
+# voila
 
 FIXME: description
 
@@ -10,7 +10,7 @@ Download from http://example.com/FIXME.
 
 FIXME: explanation
 
-    $ java -jar ila-prototype-0.1.0-standalone.jar [args]
+    $ java -jar voila-0.1.0-standalone.jar [args]
 
 ## Options
 

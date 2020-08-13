@@ -1,4 +1,4 @@
-(ns ila-prototype.core
+(ns voila.core
   (:require muuntaja.core
             ring.middleware.params
             reitit.coercion.spec

@@ -1,6 +1,6 @@
-(defproject ila-prototype "1.0.1-SNAPSHOT"
+(defproject voila "1.0.1-SNAPSHOT"
   :description "ila-project prototype project"
-  :url "https://github.com/ELiTLtd/ila-prototype"
+  :url "https://github.com/ELiTLtd/voila"
   :min-lein-version "2.0.0"
   :dependencies [[clj-http "3.10.1"]
                  [metosin/muuntaja "0.6.7"]
@@ -19,5 +19,5 @@
   :repositories [["public-github" {:url "git://github.com"}]
                  ["private-github" {:url "git://github.com"
                                     :protocol :ssh}]]
-  :main ^:skip-aot ila-prototype.core
+  :main ^:skip-aot voila.core
   :target-path "target/%s")
