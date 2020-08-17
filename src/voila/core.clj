@@ -19,7 +19,7 @@
   {:name :resources/healthcheck
    :get {:handler (fn [_request]
                     {:status 200
-                     :body {:status "OK"}})}})
+                     :body {:status "TEST"}})}})
 
 (def router
   (reitit.ring/router
