@@ -1,4 +1,4 @@
-(defproject voila "1.0.1"
+(defproject voila "1.0.2-SNAPSHOT"
   :description "ila-project prototype project"
   :url "https://github.com/ELiTLtd/voila"
   :min-lein-version "2.0.0"
@@ -12,7 +12,8 @@
                  [ring/ring-jetty-adapter "1.8.1"]
                  [ring/ring-servlet "1.8.1"]]
   :plugins [[reifyhealth/lein-git-down "0.3.6"]
-            [lein-shell "0.5.0"]]
+            [lein-shell "0.5.0"]
+            [lein-pprint "1.3.2"]]
   :profiles {:dev {:dependencies [[ring/ring-devel "1.8.1"]]}
              :testing {:dependencies [[ring/ring-mock "0.4.0"]]}
              :uberjar {:aot :all}}
