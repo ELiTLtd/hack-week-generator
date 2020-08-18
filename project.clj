@@ -11,7 +11,8 @@
                  [ring/ring-core "1.8.1"]
                  [ring/ring-jetty-adapter "1.8.1"]
                  [ring/ring-servlet "1.8.1"]]
-  :plugins [[reifyhealth/lein-git-down "0.3.6"]]
+  :plugins [[reifyhealth/lein-git-down "0.3.6"]
+            [lein-shell "0.5.0"]]
   :profiles {:dev {:dependencies [[ring/ring-devel "1.8.1"]]}
              :testing {:dependencies [[ring/ring-mock "0.4.0"]]}
              :uberjar {:aot :all}}
@@ -19,5 +20,15 @@
   :repositories [["public-github" {:url "git://github.com"}]
                  ["private-github" {:url "git://github.com"
                                     :protocol :ssh}]]
+  :release-tasks [["vcs" "assert-committed"]
+                  ["change" "version" "leiningen.release/bump-version" "release"]
+                  ["vcs" "commit"]
+                  ["vcs" "tag" "--no-sign"]
+                  ["clean"]
+                  ["uberjar"]
+                  ["shell" "scripts/deploy.sh" ~(-> (slurp "project.clj") (clojure.string/split #"\s") (nth 2))]
+                  ["change" "version" "leiningen.release/bump-version"]
+                  ["vcs" "commit"]
+                  ["vcs" "push"]]
   :main ^:skip-aot voila.core
   :target-path "target/%s")
