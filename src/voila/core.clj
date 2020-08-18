@@ -13,7 +13,7 @@
   {:name :resources/sample
    :get {:handler (fn [_request]
                     {:status 200
-                     :body {:status "TEST 2"}})}})
+                     :body {:status "TEST 3"}})}})
 
 (def healthcheck-resource
   {:name :resources/healthcheck
