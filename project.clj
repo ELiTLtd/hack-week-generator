@@ -1,4 +1,4 @@
-(defproject voila "1.0.2"
+(defproject voila "1.0.3-SNAPSHOT"
   :description "ila-project prototype project"
   :url "https://github.com/ELiTLtd/voila"
   :min-lein-version "2.0.0"
@@ -27,7 +27,7 @@
                   ["vcs" "tag" "--no-sign"]
                   ["clean"]
                   ["uberjar"]
-                  ["shell" "scripts/deploy.sh" ~(-> (slurp "project.clj") (clojure.string/split #"\s") (nth 2))]
+                  ["shell" "scripts/deploy.sh"]
                   ["change" "version" "leiningen.release/bump-version"]
                   ["vcs" "commit"]
                   ["vcs" "push"]]

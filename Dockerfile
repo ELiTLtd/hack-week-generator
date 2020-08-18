@@ -14,9 +14,9 @@ ENV LC_ALL en_GB.UTF-8
 
 RUN mkdir -p /app /app/resources
 WORKDIR /app
-COPY target/uberjar/voila-1.0.1-standalone.jar .
-CMD java -jar voila-1.0.1-standalone.jar
+COPY target/uberjar/voila-1.0.2-standalone.jar .
+CMD java -jar voila-1.0.2-standalone.jar
 
 EXPOSE 9000
 
-CMD java -jar voila-1.0.1-standalone.jar
+CMD java -jar voila-1.0.2-standalone.jar
