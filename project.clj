@@ -16,7 +16,8 @@
             [lein-pprint "1.3.2"]]
   :profiles {:dev {:dependencies [[ring/ring-devel "1.8.1"]]}
              :testing {:dependencies [[ring/ring-mock "0.4.0"]]}
-             :uberjar {:aot :all}}
+             :uberjar {:aot :all
+                       :uberjar-name "voila-uberjar.jar"}}
   :middleware [lein-git-down.plugin/inject-properties]
   :repositories [["public-github" {:url "git://github.com"}]
                  ["private-github" {:url "git://github.com"
