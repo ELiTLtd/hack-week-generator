@@ -30,7 +30,6 @@
                   ["uberjar"]
                   ["shell" "scripts/deploy.sh"]
                   ["change" "version" "leiningen.release/bump-version"]
-                  ["vcs" "commit"]
-                  ["vcs" "push"]]
+                  ["vcs" "commit"]]
   :main ^:skip-aot voila.core
   :target-path "target/%s")
