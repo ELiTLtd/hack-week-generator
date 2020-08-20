@@ -1,5 +1,6 @@
 (ns voila.core
-  (:require muuntaja.core
+  (:require [clojure.spec.alpha :as s]
+            muuntaja.core
             ring.middleware.params
             reitit.coercion.spec
             reitit.ring
@@ -8,6 +9,19 @@
             [ring.adapter.jetty :as ring-jetty])
   (:gen-class))
 
+(def example-event
+  {:type "task-attempt"
+   :data {:user-id "4815694e-0b85-4d71-9aea-fac8707daf2b"
+          :task {:id "a694da2f-87e9-4832-878a-c0e623c36348"}}})
+
+(s/def ::type string?)
+(s/def ::data map?)
+
+(s/def ::event
+  (s/keys :req [::type ::data]))
+
+(s/valid? ::event {:voila.core/type "blah blah"
+                   :voila.core/data {}})
 
 (def sample-resource
   {:name :resources/sample

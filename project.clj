@@ -7,6 +7,7 @@
                  [metosin/potpuri "0.5.2"]
                  [metosin/reitit "0.5.2"]
                  [org.clojure/clojure "1.10.1"]
+                 [org.clojure/spec.alpha "0.2.187"]
                  [org.eclipse.jetty/jetty-server "9.4.28.v20200408"]
                  [ring/ring-core "1.8.1"]
                  [ring/ring-jetty-adapter "1.8.1"]
