@@ -48,7 +48,7 @@
   (reset! server-instance
           (ring-jetty/run-jetty #'root-handler
                                 {:port port
-                                 :join? true})))
+                                 :join? false})))
 
 (defn -main
   [& args]
