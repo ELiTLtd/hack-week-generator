@@ -34,5 +34,7 @@ jobs:
       uses: oleksiyrudenko/gha-git-credentials@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Install copilot
+      run: curl -Lo /usr/local/bin/copilot https://github.com/aws/copilot-cli/releases/download/v0.3.0/copilot-linux-v0.3.0 && chmod +x /usr/local/bin/copilot
     - name: Run release
       run: lein release
