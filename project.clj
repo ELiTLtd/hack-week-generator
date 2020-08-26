@@ -25,12 +25,12 @@
                                     :protocol :ssh}]]
   :release-tasks [["vcs" "assert-committed"]
                   ["change" "version" "leiningen.release/bump-version" "release"]
-                  ["vcs" "commit"]
+                  ["vcs" "commit" "Version %s [skip ci]"]
                   ["vcs" "tag" "--no-sign"]
                   ["clean"]
                   ["uberjar"]
                   ["shell" "scripts/deploy.sh"]
                   ["change" "version" "leiningen.release/bump-version"]
-                  ["vcs" "commit"]]
+                  ["vcs" "commit" "Version %s [skip ci]"]]
   :main ^:skip-aot voila.core
   :target-path "target/%s")
