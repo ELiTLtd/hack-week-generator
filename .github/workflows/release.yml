@@ -32,5 +32,7 @@ jobs:
         aws-region: eu-west-1
     - name: Run release
       uses: fnkr/github-action-git-bash@v1
-      secrets: ${{ secrets.GITHUB_TOKEN }}
-      args: [ "lein", "release" ]
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        args: lein release
