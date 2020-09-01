@@ -39,7 +39,9 @@ jobs:
         mkdir ${{ github.workspace }}/bin
         curl -Lo ${{ github.workspace }}/bin/copilot https://github.com/aws/copilot-cli/releases/download/v0.3.0/copilot-linux-v0.3.0
         chmod +x ${{ github.workspace }}/bin/copilot
-        echo "::add-path::${{ github.workspace }}/bin/copilot"
+        echo "::add-path::${{ github.workspace }}/bin"
     - name: Run release
-      run: lein release
+      run: |
+        echo $PATH
+        lein release
         
