@@ -69,5 +69,29 @@
 
 (def content-instances [content-instance-1, content-instance-2, content-instance-3])
 
+;; --------------------------------
+;; Experimenting with some sorting
+;; and general Clojure practice
+;; (most of it can probably be
+;; removed later)
+;; --------------------------------
 
+(defn get-global-id
+  [event]
+  (get-in event [:events/actor :events/actor-global-id]))
+
+(defn get-content-id
+  [content]
+  (:content/uuid content))
+
+(defn get-ids
+  [content-list id-locator]
+  (map id-locator content-list))
+
+(defn get-sorted-ids-from-collection
+  [collection id-locator]
+  (sort (get-ids collection id-locator)))
+
+;; Test that it works
+(get-sorted-ids-from-collection content-instances get-content-id)
 
