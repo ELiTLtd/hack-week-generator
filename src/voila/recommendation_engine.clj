@@ -95,3 +95,19 @@
 ;; Test that it works
 (get-sorted-ids-from-collection content-instances get-content-id)
 
+;; --------------------------------
+;; The actual necessary code for
+;; sorting
+;; --------------------------------
+
+(defn sort-events-by-id
+  [collection]
+  (sort-by #(get-in (:events/actor %) [:events/actor-global-id]) collection))
+
+(defn sort-content-by-id
+  [collection]
+  (sort-by :content/uuid collection))
+
+;; Test that it works
+(sort-events-by-id learning-events)
+(sort-content-by-id content-instances)
