@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+
+  test:
+    if: "!contains(github.event.commits[0].message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install dependencies
+      run: lein deps
+    - name: Run tests
+      run: lein test
+
+  release:
+    if: "!contains(github.event.commits[0].message, '[skip ci]')"
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-1
+    - name: Configure Git Credentials
+      uses: oleksiyrudenko/gha-git-credentials@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Install copilot
+      run: curl -Lo ${{ github.workspace }}/copilot https://github.com/aws/copilot-cli/releases/download/v0.3.0/copilot-linux-v0.3.0 && chmod +x ${{ github.workspace }}/copilot
+    - name: Run release
+      run: lein release
