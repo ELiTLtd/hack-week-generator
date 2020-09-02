@@ -1,7 +1,8 @@
 (ns voila.events
   (:require [clojure.spec.alpha :as s]
             [clojure.set :as set]
-            [clojure.test.check.generators :as gen]))
+            [clojure.test.check.generators :as gen]
+            [tick.alpha.api :as t]))
 
 (s/def :events/learning-event   ;; we might want to create a system-event too, but have no example files atm
   (s/keys :req-un [:events/actor
@@ -35,7 +36,7 @@
 (s/def :events/actor-global-id string?)                     ;; "ext_user_id" / "extStudentID"
 (s/def :events/actor-local-id uuid?)                        ;; "actor uuid" / "actorid"
 (s/def :events/assigned-path-id string?)                    ;; unknown
-(s/def :events/bundle-codes (s/coll-of string?))
+(s/def :events/bundle-codes (s/coll-of string? :distinct true :count (rand-int 5)))
 (s/def :events/class-id uuid?)                              ;; "classid" / "groupid"
 (s/def :events/country string?)                             ;; we can technically also get this from gigya
 (s/def :events/event-id string?)                            ;; "uuid"
@@ -48,4 +49,14 @@
                       "downloaded" }) ;; excluding teacher events such as "evaluated" for now since we're missing example files
 (s/def :events/ua string?)
 
+(defn generate-activity
+  []
+  (nth (gen/sample
+         (gen/fmap #((fn [x] (assoc x :event-timestamp (t/now)))
+                      (assoc-in % [:activity :activity-timestamp]
+                                (t/- (t/now)
+                                     (t/new-duration (rand-int 60) :seconds))))
+                   (s/gen :events/learning-event 10))) 9))
+
+(generate-activity)
 
