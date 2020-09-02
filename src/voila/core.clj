@@ -6,7 +6,8 @@
             reitit.ring
             reitit.ring.coercion
             reitit.ring.middleware.muuntaja
-            [ring.adapter.jetty :as ring-jetty])
+            [ring.adapter.jetty :as ring-jetty]
+            [voila.users :as user])
   (:gen-class))
 
 (def example-event
@@ -23,11 +24,19 @@
 (s/valid? ::event {:voila.core/type "blah blah"
                    :voila.core/data {}})
 
+(def user-resource
+  {:name :resources/user
+   :get {:handler (fn [_request]
+                    (let [user-id (get-in _request [:path-params :user-id])]
+                    {:status 200
+                     :body {:status "TEST 5"
+                            :user (voila.users/get-user (Integer/valueOf user-id))}}))}})
+
 (def sample-resource
   {:name :resources/sample
    :get {:handler (fn [_request]
                     {:status 200
-                     :body {:status "TEST 5"}})}})
+                     :body {:status "TEST 6"}})}})
 
 (def healthcheck-resource
   {:name :resources/healthcheck
@@ -38,7 +47,8 @@
 (def router
   (reitit.ring/router
    [["/healthcheck" healthcheck-resource]
-    ["/sample" sample-resource]]
+    ["/sample" sample-resource]
+    ["/user/:user-id" user-resource]]
    {:data {:muuntaja muuntaja.core/instance
            :middleware [reitit.ring.middleware.muuntaja/format-middleware
                         reitit.ring.coercion/coerce-exceptions-middleware
@@ -60,7 +70,7 @@
   [port]
   (stop-server)
   (reset! server-instance
-          (ring-jetty/run-jetty #'root-handler
+          (ring-jetty/run-jetty root-handler
                                 {:port port
                                  :join? false})))
 
