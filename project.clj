@@ -16,22 +16,26 @@
   :plugins [[reifyhealth/lein-git-down "0.3.6"]
             [lein-shell "0.5.0"]
             [lein-pprint "1.3.2"]]
-  :profiles {:dev {:dependencies [[ring/ring-devel "1.8.1"]]}
+  :profiles {:dev {:dependencies [[ring/ring-devel "1.8.1"]
+                                  [thheller/shadow-cljs "2.11.2"]]}
              :testing {:dependencies [[ring/ring-mock "0.4.0"]]}
              :uberjar {:aot :all
-                       :uberjar-name "voila-uberjar.jar"}}
+                       :uberjar-name "voila-api-uberjar.jar"}}
   :middleware [lein-git-down.plugin/inject-properties]
   :repositories [["public-github" {:url "git://github.com"}]
                  ["private-github" {:url "git://github.com"
                                     :protocol :ssh}]]
+  :aliases {"shadow-cljs" ["run" "-m" "shadow.cljs.devtools.cli"]}
   :release-tasks [["vcs" "assert-committed"]
                   ["change" "version" "leiningen.release/bump-version" "release"]
                   ["vcs" "commit" "Version %s [skip ci]"]
                   ["vcs" "tag" "--no-sign"]
                   ["clean"]
+                  ["shadow-cljs" "release" "introspect"]
                   ["uberjar"]
                   ["shell" "scripts/deploy.sh"]
                   ["change" "version" "leiningen.release/bump-version"]
                   ["vcs" "commit" "Version %s [skip ci]"]]
-  :main ^:skip-aot voila.core
+  :clean-targets [:target-path "public/js" ".shadow-cljs"]
+  :main ^:skip-aot voila-api.core
   :target-path "target/%s")

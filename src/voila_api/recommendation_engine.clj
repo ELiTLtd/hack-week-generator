@@ -1,12 +1,12 @@
-(ns voila.recommendation-engine
-  (:require [voila.content :as content]
-            [voila.events :as events]))
+(ns voila-api.recommendation-engine
+  (:require [voila-api.content :as content]
+            [voila-api.events :as events]))
 
 ;; --- Some test content and events
 
-(def event-instances (repeatedly 3 #(voila.events/generate-activity)))
+(def event-instances (repeatedly 3 #(voila-api.events/generate-activity)))
 
-(def content-instances (repeatedly 3 #(voila.content/generate-content)))
+(def content-instances (repeatedly 3 #(voila-api.content/generate-content)))
 
 ;; --------------------------------
 ;; Experimenting with some sorting

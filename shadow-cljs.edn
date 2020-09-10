@@ -1,0 +1,4 @@
+{:source-paths ["src"]
+ :dev-http {9010 "public"}
+ :builds {:introspect {:target :browser
+                       :modules {:main {:init-fn voila-introspect.main/init}}}}}

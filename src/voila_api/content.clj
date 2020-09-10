@@ -1,4 +1,4 @@
-(ns voila.content
+(ns voila-api.content
   (:require [clojure.spec.alpha :as s]
             [clojure.spec.gen.alpha :as gen]))
 

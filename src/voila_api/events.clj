@@ -1,4 +1,4 @@
-(ns voila.events
+(ns voila-api.events
   (:require [clojure.spec.alpha :as s]
             [clojure.set :as set]
             [clojure.test.check.generators :as gen]

@@ -1,4 +1,4 @@
-(ns voila.users)
+(ns voila-api.users)
 
 (def first-names ["Alice" "Bob" "Charlie" "Eggbert" "Yoongi" "Kim"])
 (def surnames ["Park" "Min" "Smith" "Yeoung"])

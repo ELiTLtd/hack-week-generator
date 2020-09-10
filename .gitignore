@@ -10,3 +10,9 @@ pom.xml.asc
 /.nrepl-port
 .hgignore
 .hg/
+.shadow-cljs
+.idea
+public/js/*
+*.iml
+node_modules
+package-lock.json
