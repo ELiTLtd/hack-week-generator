@@ -13,12 +13,12 @@ Currently we host the `voila-introspect` web app under `/internal/app` of the
 highly decoupled.
 
 Contains [terraform](https://www.terraform.io/) configuration for managing other
-related infrastructure here [`terraform`](./tree/master/terraform).
+related infrastructure here [`terraform`](terraform).
 
 Contains [GitHub Actions](https://github.com/features/actions) for configuring
 [Continuous Integration](#continuous-integration) and [Continuous
 Deployment](#continuous-deployment) here
-[`.github/workflows`](./tree/master/.github/workflows).
+[`.github/workflows`](.github/workflows).
 
 ## Required Software & Configuration
 
