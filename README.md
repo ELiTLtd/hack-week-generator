@@ -12,12 +12,13 @@ Currently we host the `voila-introspect` web app under `/internal/app` of the
 `voila-api` although it's a goal of the project to have all three elements be
 highly decoupled.
 
-Contains [terraform](https://www.terraform.io/)
-configuration for managing other related infrastructure here `terraform`.
+Contains [terraform](https://www.terraform.io/) configuration for managing other
+related infrastructure here [`terraform`](./tree/master/terraform).
 
 Contains [GitHub Actions](https://github.com/features/actions) for configuring
-[Continuous Integration](#Continuous_Integration) and [Continuous
-Deployment](#Continuous_Deployment) here `.github/workflows`.
+[Continuous Integration](#continuous-integration) and [Continuous
+Deployment](#continuous-deployment) here
+[`.github/workflows`](./tree/master/.github/workflows).
 
 ## Required Software & Configuration
 
@@ -56,7 +57,7 @@ And run:
 
 ## Testing
 
-See the section on [Continuous Integration](#Continuous_Integration)
+See the section on [Continuous Integration](#continuous-integration)
 
 ### `voila-api`
 
@@ -66,7 +67,7 @@ You can run the tests for voila-api with
 
 ## Deploying
 
-_See the section on [Continuous Deployment](#Continuous_Deployment)_
+_See the section on [Continuous Deployment](#continuous-deployment)_
 
 We use [aws-copilot](https://github.com/aws/copilot-cli) to deploy new versions
 of the voila-api. It currently depends on building and sending a docker image
