@@ -1,0 +1,38 @@
+{
+  "product":{
+    "code":"evpel3a"
+  },
+  "productcode":"evpel3a",
+  "org":"bangkok-prod1",
+  "created":1584615451694,
+  "groupid":"47bc185f-66be-11ea-9397-0242ac110003",
+  "verb":"attempted",
+  "type":"learning",
+  "bundle-codes":[
+    "evpel3a_bundle"
+  ],
+  "platform":{
+    "ua":"Mozilla/5.0 (iPhone; CPU iPhone OS 13_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Mobile/15E148 Safari/604.1"
+  },
+  "space_key":"org_bangkok-prod1",
+  "actor":{
+    "role":"student",
+    "address":{
+      "country":"TH"
+    },
+    "ext_user_id":"6834a4308e0947cea67f3cd2f63cb76a",
+    "uuid":"f0831023-6907-11ea-9397-0242ac110003"
+  },
+  "classid":"47bc185f-66be-11ea-9397-0242ac110003",
+  "actorid":"f0831023-6907-11ea-9397-0242ac110003",
+  "modified":1584615451694,
+  "entity":{
+    "result":"{\"score\":{\"scaled\":0.14285714285714285,\"max\":14,\"raw\":2,\"min\":0}}",
+    "verb":"attempted",
+    "item-code":"1551433155226/1551433271837/1551433370099",
+    "timestamp":1584615450057
+  },
+  "extStudentId":"6834a4308e0947cea67f3cd2f63cb76a",
+  "status":"in-process",
+  "uuid":"cup1#6834a4308e0947cea67f3cd2f63cb76a$$learning#1584615451694#00016e10-3be4-42ff-bc49-33fda275b463"
+}

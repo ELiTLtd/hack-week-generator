@@ -1,20 +1,36 @@
-(ns voila-api.users)
+(ns voila-api.users
+  (:import (java.util UUID Locale))
+  (:require [voila-api.content :as content-gen]))
 
-(def first-names ["Alice" "Bob" "Charlie" "Eggbert" "Yoongi" "Kim"])
-(def surnames ["Park" "Min" "Smith" "Yeoung"])
-(def hobbies ["singing" "dancing" "painting" "ping-pong"])
+(def classes ["C1" "CSAT" "TOPIC" "IELTS"])
 
 (defn generate-user []
-  {:first-name (rand-nth first-names)
-   :surname (rand-nth surnames)
-   :age (rand-int 100)
-   :hobbies (set(repeatedly (inc (rand-int (count hobbies))) #(rand-nth hobbies)))})
+  {:global-learner-id (UUID/randomUUID)
+   :classes           (set (repeatedly (inc (rand-int (count classes))) #(rand-nth classes)))
+   :age               (rand-int 100)
+   :skill-level       (rand-int 100)
+   :activity-history  (repeatedly (rand-int 10) #(content-gen/generate-content))
+   :country           (rand-nth (Locale/getISOCountries))
+   :l1                (rand-nth (Locale/getISOLanguages))
+   })
+
+(defn generate-user-with-id [id]
+  (assoc-in (generate-user) [:global-learner-id] id))
+
 
 (defn generate-users
   [num]
   (zipmap (range num)
           (take num
-                (repeatedly generate-user ))))
+                (repeatedly generate-user))))
+
+
+
+;; ----------------------
+;; Tests
+;; ----------------------
+
+(generate-user-with-id "test-id")
 
 (def users (generate-users 10))
 

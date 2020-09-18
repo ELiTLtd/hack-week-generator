@@ -4,7 +4,7 @@
 
 ;; --- Some test content and events
 
-(def event-instances (repeatedly 3 #(voila-api.events/generate-activity)))
+(def event-instances (repeatedly 3 #(voila-api.events/generate-event)))
 
 (def content-instances (repeatedly 3 #(voila-api.content/generate-content)))
 
@@ -36,7 +36,9 @@
 
 ;; --------------------------------
 ;; The actual necessary code for
-;; sorting
+;; sorting. Once we've got code for
+;; making a recommendation order,
+;; we can sort by rec order instead.
 ;; --------------------------------
 
 (defn sort-events-by-id

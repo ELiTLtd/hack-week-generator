@@ -10,6 +10,7 @@
                  [org.clojure/spec.alpha "0.2.187"]
                  [org.eclipse.jetty/jetty-server "9.4.28.v20200408"]
                  [ring/ring-core "1.8.1"]
+                 [ring/ring-mock "0.4.0"]
                  [ring/ring-jetty-adapter "1.8.1"]
                  [ring/ring-servlet "1.8.1"]
                  [tick "0.4.26-alpha"]]
@@ -17,8 +18,8 @@
             [lein-shell "0.5.0"]
             [lein-pprint "1.3.2"]]
   :profiles {:dev {:dependencies [[ring/ring-devel "1.8.1"]
-                                  [thheller/shadow-cljs "2.11.2"]]}
-             :testing {:dependencies [[ring/ring-mock "0.4.0"]]}
+                                  [thheller/shadow-cljs "2.11.2"]
+                                  [ring/ring-mock "0.4.0"]]}
              :uberjar {:aot :all
                        :uberjar-name "voila-api-uberjar.jar"}}
   :middleware [lein-git-down.plugin/inject-properties]

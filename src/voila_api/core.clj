@@ -1,6 +1,5 @@
 (ns voila-api.core
-  (:require [clojure.spec.alpha :as s]
-            muuntaja.core
+  (:require muuntaja.core
             ring.middleware.params
             reitit.coercion.spec
             reitit.ring

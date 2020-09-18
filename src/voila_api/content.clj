@@ -19,4 +19,6 @@
   []
   (nth (gen/sample (s/gen :content/content-instance 10)) 9))
 
-(generate-content)
+(defn generate-content-with-id
+  [id]
+  (assoc-in (generate-content) [:uuid] id))
