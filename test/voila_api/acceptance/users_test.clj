@@ -2,20 +2,18 @@
   (:require [clojure.test :refer :all]
             [jsonista.core :as json]
             [ring.mock.request :as ring-mock]
-            [voila-api.core :as core]
-            [voila-api.core-test :refer [handler]])
-  (:import (java.util UUID)))
+            [voila-api.acceptance.common :as common]))
 
 (deftest get-a-user
-  (is (every? #(= (:status %) 200)
-              (map #(handler (ring-mock/request :get (str "/user/" %))) (range 1 11))))
-  (is (= #{:l1 :age :skill-level :activity-history :global-learner-id :country :classes} (-> (handler (ring-mock/request :get "/user/1"))
-                                                   :body
-                                                   :user
-                                                   (keys)
-                                                   (set))))
-  (is (= {:status  200,
-          :body    {:status "TEST 5", :user {:age 75 :skill-level 14 :global-learner-id (UUID/randomUUID)}},
-          :headers {"Content-Type" "application/json; charset=utf-8"}})))
+  (testing "all users return an OK response"
+    (let [user-responses (for [n (range 1 11)]
+                           (common/test-handler (ring-mock/request :get (str "/api/v1/users/" n "/representation"))))]
 
-(get-a-user)
+      (is (every? #(= (:status %) 200) user-responses))))
+
+  (testing "users response contains correct keys"
+    (is (= #{:l1 :age :skill-level :activity-history :global-learner-id :country :classes}
+           (-> (common/test-handler (ring-mock/request :get "/api/v1/users/1/representation"))
+               :body
+               (keys)
+               (set))))))

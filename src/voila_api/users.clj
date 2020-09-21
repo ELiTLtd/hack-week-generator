@@ -24,14 +24,6 @@
           (take num
                 (repeatedly generate-user))))
 
-
-
-;; ----------------------
-;; Tests
-;; ----------------------
-
-(generate-user-with-id "test-id")
-
 (def users (generate-users 10))
 
 (defn get-user
