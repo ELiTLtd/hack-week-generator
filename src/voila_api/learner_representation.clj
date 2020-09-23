@@ -2,22 +2,6 @@
   (:require [voila-api.users :as users]
             [clojure.pprint :as pp]))
 
-(def test-map {:global-learner-id #uuid "c395f629-cfab-4568-920c-682bf9a9a77b",
-               :classes           #{"C1" "IELTS"},
-               :first-name        "Charlie",
-               :surname           "Smith",
-               :age               31,
-               :skill-level       91,
-               :hobbies           #{"ping-pong"}})
-
-(def new-learner {:global-learner-id #uuid "cc5248b4-116b-493a-a7c2-8bd127606e05",
-                  :classes           #{"CSAT"},
-                  :first-name        "Geir",
-                  :surname           "Hank",
-                  :age               12,
-                  :skill-level       2,
-                  :hobbies           #{"singing"}})
-
 ;; -------------------------
 ;; The code for storage
 ;; -------------------------
@@ -30,9 +14,7 @@
 
 (defn add-learner
   [data id]
-  (swap! learner-rep #(if-not (find-learner id)
-                        (assoc % id data)
-                        "nil")))
+  (swap! learner-rep assoc id data))                        ;; replace with better update mechanism
 
 (defn del-learner
   [surname]
@@ -54,10 +36,20 @@
 ;; Testing
 ;; -------------------------
 
-(reset! learner-rep {})
+(def test-map {:global-learner-id #uuid "c395f629-cfab-4568-920c-682bf9a9a77b",
+               :classes           #{"C1" "IELTS"},
+               :first-name        "Charlie",
+               :surname           "Smith",
+               :age               31,
+               :skill-level       91,
+               :hobbies           #{"ping-pong"}})
 
-(def test-id "test--id")
+(def new-learner {:global-learner-id #uuid "cc5248b4-116b-493a-a7c2-8bd127606e05",
+                  :classes           #{"CSAT"},
+                  :first-name        "Geir",
+                  :surname           "Hank",
+                  :age               12,
+                  :skill-level       2,
+                  :hobbies           #{"singing"}})
 
-(add-learner test-map test-id)
-
-(find-learner test-id)
+(comment (reset! learner-rep {}))

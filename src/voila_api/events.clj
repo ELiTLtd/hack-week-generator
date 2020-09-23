@@ -41,14 +41,9 @@
                    :events/bundle-codes]))
 
 (def valid-response-examples
-  #{"{\"score\":{\"scaled\":0.7,\"min\":0,\"raw\":70,\"max\":100},\"comment\":\"<p><strong>1)</strong> <strong>In city
-   have a</strong> restaurant<strong>s</strong>, museums, malls, store in center the city ...</p><p>2) But <strong>i
-   </strong>don't like São Paulo because everyone is busy, and <strong>things always full</strong>.</p><p><br></p><p>1)
-   Which structure means \\\"exist\\\"? Is it plural or singular?</p><p>2) But I don't like São Paulo... things (verb
-   missing) always full. </p><p><br></p><p><br></p><p>Check my comments and rewrite the task.</p>\"}"
+  #{"{\"score\":{\"scaled\":0.7,\"min\":0,\"raw\":70,\"max\":100},\"comment\":\"<p><strong>1)</strong> <strong>In city have a</strong> restaurant<strong>s</strong>, museums, malls, store in center the city ...</p><p>2) But <strong>i </strong>don't like São Paulo because everyone is busy, and <strong>things always full</strong>.</p><p><br></p><p>1) Which structure means \\\"exist\\\"? Is it plural or singular?</p><p>2) But I don't like São Paulo... things (verb missing) always full. </p><p><br></p><p><br></p><p>Check my comments and rewrite the task.</p>\"}"
 
-   "{\"response\":{\"text\":\"<p>Cereal with milk</p><p>First you need to find a plate to serve the cereal, then you
-   need to fill the plate with the cereal and finally you need to add some milk and enjoy.</p>\"}}"
+   "{\"response\":{\"text\":\"<p>Cereal with milk</p><p>First you need to find a plate to serve the cereal, then you need to fill the plate with the cereal and finally you need to add some milk and enjoy.</p>\"}}"
 
    "{\"score\":{\"scaled\":0.6,\"min\":0,\"raw\":60,\"max\":100},\"comment\":\"<p>What is about managing the time?</p>\"}"
 
