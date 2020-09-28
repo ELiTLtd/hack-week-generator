@@ -82,6 +82,36 @@
       (if (some? processed-event)
         (store-in-atomic-learner-rep processed-event)))))
 
+(defn group-by-id
+  [data-list]
+  (mapv (fn [[grp-key values]]
+          (if (some? grp-key)
+            (let [scores (map :score values)]
+              {:user-id grp-key
+               :score   (/ (reduce + scores) (count scores))})))
+        (group-by :user-id data-list)))
+
+(defn aggregate-scores
+  [data-list]
+  (into [] (map (fn [[grp-key values]]
+                  (if (some? grp-key)
+                    (let [scores (map :score values)]
+                      {:user-id grp-key
+                       :score   (/ (reduce + scores) (count scores))})))
+                (group-by :user-id data-list))))
+
+(defrecord DummyBatchProcessor []
+  EventProcessor
+  (process-data [this event-list]
+    (aggregate-scores
+      (let [ep (->DummyEventProcessor)]
+        (map #(process-data ep %) event-list))))
+  Storage
+  (store [this data]
+    (doseq [processed-event data]
+      (if (some? processed-event)
+        (store-in-atomic-lr processed-event)))))
+
 ;; --------------------------
 ;; Tests
 ;; --------------------------
