@@ -110,7 +110,7 @@
   (store [this data]
     (doseq [processed-event data]
       (if (some? processed-event)
-        (store-in-atomic-lr processed-event)))))
+        (store-in-atomic-learner-rep processed-event)))))
 
 ;; --------------------------
 ;; Tests
