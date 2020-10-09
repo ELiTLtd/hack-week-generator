@@ -1,4 +1,14 @@
 {:source-paths ["src"]
+
+ :dependencies [[reagent "0.10.0" :exclusions [cljsjs/react cljsjs/react-dom]]
+                [cljs-ajax "0.8.1"]]
+
  :dev-http {9010 "public"}
+
  :builds {:introspect {:target :browser
-                       :modules {:main {:init-fn voila-introspect.main/init}}}}}
+                       :modules {:main {:init-fn voila-introspect.main/init}}
+                       :js-options {:js-provider :external
+                                    :external-index "target/index.js"}
+                       :devtools {:before-load voila-introspect.main/stop
+                                  :after-load voila-introspect.main/start}
+                       :dev {:closure-defines {voila-introspect.main/api-root "http://localhost:9000"}}}}}

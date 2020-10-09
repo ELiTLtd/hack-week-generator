@@ -15,4 +15,4 @@
               (assoc response :body decoded-body))
             (catch Exception _
               response)))
-        #'voila-api.core/root-handler))
+        (voila-api.core/root-handler (voila-api.core/create-components))))

@@ -42,6 +42,7 @@ jobs:
         echo "::add-path::${{ github.workspace }}/bin"
     - name: Run release
       run: |
+        npm install
         lein release
         git push
         

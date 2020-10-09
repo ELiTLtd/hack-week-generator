@@ -24,7 +24,8 @@
           (take num
                 (repeatedly generate-user))))
 
-(def users (generate-users 10))
+(def users
+  (generate-users 10))
 
 (defn get-user
   [user-id]

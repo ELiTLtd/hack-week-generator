@@ -16,6 +16,7 @@
                  [ring/ring-mock "0.4.0"]
                  [ring/ring-jetty-adapter "1.8.1"]
                  [ring/ring-servlet "1.8.1"]
+                 [ring-cors "0.1.13"]
                  [tick "0.4.26-alpha"]]
   :plugins [[reifyhealth/lein-git-down "0.3.6"]
             [lein-shell "0.5.0"]
@@ -36,6 +37,8 @@
                   ["vcs" "tag" "--no-sign"]
                   ["uberjar"]
                   ["shadow-cljs" "release" "introspect"]
+                  ["shell" "npx" "webpack" "--mode" "production"
+                   "target/index.js" "--output" "public/js/libs.js"]
                   ["shell" "scripts/deploy.sh"]
                   ["change" "version" "leiningen.release/bump-version"]
                   ["vcs" "commit" "Version %s [skip ci]"]]

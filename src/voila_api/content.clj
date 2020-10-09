@@ -3,11 +3,11 @@
             [clojure.spec.gen.alpha :as gen]))
 
 (s/def :content/content-instance   ;; we might want to create a system-event too, but have no example files atm
-  (s/keys :req [:content/uuid
-                :content/name
-                :content/body]
-          :opt [:content/class
-                :content/meta-tags]))
+  (s/keys :req-un [:content/uuid
+                   :content/name
+                   :content/body]
+          :opt-un [:content/class
+                   :content/meta-tags]))
 
 (s/def :content/uuid uuid?)
 (s/def :content/name string?)
@@ -17,8 +17,11 @@
 
 (defn generate-content
   []
-  (nth (gen/sample (s/gen :content/content-instance 10)) 9))
+  (gen/sample (s/gen :content/content-instance) 1))
 
 (defn generate-content-with-id
   [id]
   (assoc-in (generate-content) [:uuid] id))
+
+(comment
+  (generate-content))

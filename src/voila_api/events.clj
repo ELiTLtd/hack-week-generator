@@ -126,6 +126,8 @@
             (keys-in event-map))
        (remove nil?)))
 
+(get-paths-for {:a "hi" :b {:y "hh" :c "jidj"} :d "yea"} '(:a :c))
+
 (defn generate-event-from-data
   [key-value-map]
   (let [event (generate-event)]
