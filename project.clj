@@ -1,4 +1,4 @@
-(defproject voila "1.0.14"
+(defproject voila "1.0.15-SNAPSHOT"
   :description "ila-project prototype project"
   :url "https://github.com/ELiTLtd/voila"
   :min-lein-version "2.0.0"
