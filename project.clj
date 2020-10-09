@@ -36,7 +36,7 @@
                   ["vcs" "commit" "Version %s [skip ci]"]
                   ["vcs" "tag" "--no-sign"]
                   ["uberjar"]
-                  ["shadow-cljs" "release" "introspect"]
+                  ["shell" "npx" "shadow-cljs" "release" "introspect"]
                   ["shell" "npx" "webpack" "--mode" "production"
                    "target/index.js" "--output" "public/js/libs.js"]
                   ["shell" "scripts/deploy.sh"]
