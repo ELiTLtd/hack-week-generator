@@ -4,7 +4,7 @@
             [ring.mock.request :as ring-mock]
             [voila-api.acceptance.common :as common]))
 
-(deftest get-a-user
+#_(deftest get-a-user
   (testing "all users return an OK response"
     (let [user-responses (for [n (range 1 11)]
                            (common/test-handler (ring-mock/request :get (str "/api/v1/users/" n "/representation"))))]

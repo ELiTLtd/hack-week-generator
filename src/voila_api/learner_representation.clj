@@ -6,31 +6,21 @@
 ;; The code for storage
 ;; -------------------------
 
-(def learner-rep (atom {}))
+(defprotocol Storage
+  "Stores event data."
+  (store [this path data])
+  (retrieve [this path]))
 
-(defn find-learner
-  [learner-id]
-  (get @learner-rep learner-id))
+(defrecord AtomicStore [state]
+  Storage
+  (store [this path data]
+    (swap! state assoc-in path data))
+  (retrieve [this path]
+    (get-in @state path)))
 
-(defn add-learner
-  [data id]
-  (swap! learner-rep assoc id data))                        ;; replace with better update mechanism
-
-(defn del-learner
-  [surname]
-  (swap! learner-rep #(dissoc % surname)))
-
-(defn update-skill-level
-  [surname new-skill-lvl]
-  (swap! learner-rep #(assoc-in % [surname :score] new-skill-lvl)))
-
-(defn update-rep
-  [data id]
-  (if (some id learner-rep)
-    (update-skill-level id data)
-    (add-learner data id)))
-
-#_(pp/pprint (repeatedly 3 #(add-learner (users/generate-user))))
+;; Persistent for the lifetime of the service
+(def atomic-store
+         (->AtomicStore (atom {})))
 
 ;; -------------------------
 ;; Testing

@@ -3,7 +3,9 @@
             [clojure.set :as set]
             [clojure.test.check.generators :as gen]
             [tick.alpha.api :as t]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [spec-tools.core :as st]
+            [tick.locale-en-us :as formatter])
   (:import (clojure.lang PersistentQueue)
            (java.util Locale)))
 
@@ -56,7 +58,7 @@
     "{\"score\":{\"scaled\":0.9333333333333333,\"max\":15,\"raw\":14,\"min\":0}}"})
 
 (s/def :events/activity-id uuid?)                           ;; "entity item-code" in xAPI spec
-(s/def :events/activity-timestamp inst?)                    ;; "entity timestamp"
+(s/def :events/activity-timestamp string?)                  ;; "entity timestamp"
 (s/def :events/actor-global-id uuid?)                       ;; "ext_user_id" / "extStudentID"
 (s/def :events/actor-local-id uuid?)                        ;; "actor uuid" / "actorid"
 (s/def :events/assigned-path-id string?)                    ;; unknown
@@ -64,7 +66,7 @@
 (s/def :events/class-id uuid?)                              ;; "classid" / "groupid"
 (s/def :events/country (set (Locale/getISOCountries)))      ;; we can technically also get this from gigya
 (s/def :events/event-id uuid?)                              ;; "uuid"
-(s/def :events/event-timestamp inst?)                       ;; "created" / "modified"
+(s/def :events/event-timestamp string?)                     ;; "created" / "modified"
 (s/def :events/org string?)
 (s/def :events/product-code string?)
 (s/def :events/result string?)                              ;; score (scorable task), html text (writing task) or s3 bucket file (audio task)
@@ -77,10 +79,13 @@
 ;;  Generators
 ;; ---------------------
 
+(comment "How to encode and decode time to string"
+         (t/instant (t/format (t/now))))
+
 (defn add-result-if-correct-event-type
   [event]
   (let [verb (get-in event [:activity :verb])]
-    (if (contains? #{"attempted" "submitted"} verb)
+    (if (contains? #{"attempted"} verb)
       (assoc-in event [:activity :result]
                 (rand-nth (seq valid-response-examples)))
       (update-in event [:activity] dissoc :result))))
@@ -88,22 +93,39 @@
 (defn add-timestamps
   [event]
   (-> event
-      (assoc-in,,, [:activity :activity-timestamp]
-                   (t/- (t/now)
-                        (t/new-duration (rand-int 60) :seconds)))
-      (assoc,,, :event-timestamp (t/now))))
+      (assoc-in [:activity :activity-timestamp]
+                   (t/format (t/- (t/now)
+                                  (t/new-duration (rand-int 60) :seconds))))
+      (assoc :event-timestamp (t/format (t/now)))))
+
+(defn stringify-uuids
+  [event]
+  (-> event
+      (assoc-in [:actor :actor-global-id]
+                   (str (get-in event [:actor :actor-global-id])))
+      (assoc-in [:actor :actor-local-id]
+                   (str (get-in event [:actor :actor-local-id])))
+      (assoc-in [:activity :activity-id]
+                   (str (get-in event [:activity :activity-id])))
+      (assoc-in [:activity :activity-id]
+                   (str (get-in event [:activity :class-id])))
+      (assoc :event-id
+                (str (get event :event-id)))))
 
 (defn generate-event
   []
   (nth (gen/sample
          (gen/fmap #(->> %
                          (add-timestamps)
-                         (add-result-if-correct-event-type))
+                         (add-result-if-correct-event-type)
+                         (stringify-uuids))
                    (s/gen :events/learning-event 10))) 9))
 
 (defn generate-event-batch
   [n]
   (repeatedly n #(generate-event)))
+
+
 
 (defn keys-in [data]
   "Gets key paths ending in leaves from a map, outputs as vector of vectors."
@@ -126,8 +148,6 @@
             (keys-in event-map))
        (remove nil?)))
 
-(get-paths-for {:a "hi" :b {:y "hh" :c "jidj"} :d "yea"} '(:a :c))
-
 (defn generate-event-from-data
   [key-value-map]
   (let [event (generate-event)]
@@ -137,6 +157,10 @@
                  event
                  (get-paths-for event (keys key-value-map)))
          (add-result-if-correct-event-type))))
+
+(defn generate-event-batch-from-data
+  [n data-list]
+  (repeatedly n #(generate-event-from-data data-list)))
 
 (comment
   (generate-event-from-data {:product-code "this" :bundle-codes ["test" "works!"]}))
@@ -155,4 +179,7 @@
 
 (comment
   (generate-event-batch 3))
+
+(comment
+  (generate-event-from-data {:actor-global-id "test-id" :verb "attempted"}))
 
