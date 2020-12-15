@@ -1,6 +1,7 @@
-(ns hack-week-generator-api.generator
+(ns generator-api.generator
   (:require [libpython-clj.require :refer [require-python]]
-            [libpython-clj.python :as py :refer [py. py.. py.-]]))
+            [libpython-clj.python :as py :refer [py. py.. py.-]]
+            [clojure.string :as string]))
 
 (comment
   (nltk/download "book")
@@ -19,7 +20,8 @@
                 'mxnet
                 '(mxnet ndarray module io model))
 
-(def torch-model (py/$a transformers/GPT2LMHeadModel from_pretrained "gpt2"))
+(def torch-model
+  (py/$a transformers/GPT2LMHeadModel from_pretrained "gpt2"))
 
 ;;; Set the model in evaluation mode to deactivate the DropOut modules
 ;;; This is IMPORTANT to have reproducible results during evaluation!
@@ -63,14 +65,21 @@
 ;;                 (range num-of-words-to-predict))]
 ;;     (decode-sequence result)))
 
-(def tokenizer (py/$a transformers/GPT2Tokenizer from_pretrained "gpt2"
-                      :additional_special_tokens ["\n"]))
+(def tokenizer (py/$a transformers/GPT2Tokenizer from_pretrained "gpt2"))
+
+(comment
+  (time
+   (py/$a transformers/GPT2Tokenizer from_pretrained "gpt2")))
 
 
-(def tensorflow-head-model (py/$a transformers/TFGPT2LMHeadModel from_pretrained "gpt2"
+(defn create-tokenizer
+  []
+  (py/$a transformers/GPT2Tokenizer from_pretrained "gpt2"))
+
+(defonce tensorflow-head-model (py/$a transformers/TFGPT2LMHeadModel from_pretrained "gpt2"
                                   :pad_token_id (py/$. tokenizer "eos_token_id")))
 
-(def tensorflow-double-head-model (py/$a transformers/TFGPT2DoubleHeadsModel from_pretrained "gpt2"
+(defonce tensorflow-double-head-model (py/$a transformers/TFGPT2DoubleHeadsModel from_pretrained "gpt2"
                                          :pad_token_id (py/$. tokenizer "eos_token_id")))
 
 (def input-ids (py/$a tokenizer encode
@@ -86,14 +95,14 @@
             :skip_special_tokens true))))
 
 (defn greedy-output
-  [input]
-  (py/$a tensorflow-model generate
+  [model max-length input]
+  (py/$a model generate
          input
          :max_length max-length))
 
 (defn beam-output
-  [input]
-  (py/$a tensorflow-model generate
+  [model max-length input]
+  (py/$a model generate
          input
          :max_length max-length
          :num_beams 5
@@ -102,8 +111,8 @@
          :early_stopping true))
 
 (defn top-k-output
-  [input]
-  (py/$a tensorflow-model generate
+  [model max-length input]
+  (py/$a model generate
          input
          :max_length max-length
          :do_sample true
@@ -111,7 +120,7 @@
          :num_return_sequences 5))
 
 (defn top-p-output
-  [model input]
+  [model max-length input]
   (py/$a model generate
          input
          :max_length max-length
@@ -120,12 +129,66 @@
          :top_p 0.99999
          :num_return_sequences 5))
 
+(defprotocol Generator
+  (generate [this input] [this input configuration]))
+
+(defrecord GPT2TopPSamplingGenerator [tokenizer model]
+  Generator
+  (generate [this input]
+    (generate this input {}))
+  (generate [this input options]
+    (let [input-tokens (py/$a tokenizer :encode input :return_tensors "tf")
+          merged-options (merge {:max_length 20
+                                 :do_sample true
+                                 :top_k 10
+                                 :top_p 0.9
+                                 :num_return_sequences 5}
+                                options)]
+      (pmap #(py/$a tokenizer :decode % :skip_special_tokens true)
+            (py/call-attr-kw tensorflow-head-model
+                             :generate
+                             [input-tokens]
+                             merged-options)))))
+
+(defn create-generator-buddy.v1
+  [tokenizer]
+  (->GPT2TopPSamplingGenerator
+   tokenizer
+   (py/$a transformers/TFGPT2LMHeadModel :from_pretrained "gpt2"
+          :pad_token_id (py/$. tokenizer "eos_token_id"))))
+
+(comment
+  (let [input-s "Hello World, I want to "
+        input-tokens (py/$a tokenizer encode input-s :return_tensors "tf")]
+    (py/call-attr-kw tensorflow-head-model
+                     :generate
+                     [input-tokens]
+                     {:max_length max-length
+                      :do_sample true
+                      :top_k 10
+                      :top_p 0.99
+                      :num_return_sequences 5}))
+
+  (generate (->GPT2TopPSamplingGenerator tokenizer tensorflow-head-model) "Do do do"))
+
 (defn generate-text
-  [input]
-  (println "Generating text\n")
-  (println (str "Original text: "(->> input decode-sequence (apply str)) "\n"))
-  ;; (println (str "Greedy output: "(-> input greedy-output decode-sequence) "\n"))
-  ;; (println (str "Beam output:   "(-> input beam-output decode-sequence) "\n"))
-  ;; (println (str "Top_K outputs: \n" (->> input top-k-output decode-sequence (string/join "\n")) "\n"))
-  (println (str "[HEAD MODEL] Top_P outputs: \n" (->> input (top-p-output tensorflow-head-model) decode-sequence (string/join "\n")) "\n"))
-  (println (str "[DOUBLE HEAD MODEL] Top_P outputs: \n" (->> input (top-p-output tensorflow-double-head-model) decode-sequence (string/join "\n")) "\n")))
+  [input max-length]
+  (let [tokenized-input (py/$a tokenizer encode input :return_tensors "tf")]
+    (println "Generating text")
+    (println (str "Original text: " input))
+    (println (str "Max Length: " max-length "\n"))
+    ;; (println (str "Greedy output: "(-> input greedy-output decode-sequence) "\n"))
+    ;; (println (str "Beam output:   "(-> input beam-output decode-sequence) "\n"))
+    ;; (println (str "Top_K outputs: \n" (->> input top-k-output decode-sequence (string/join "\n")) "\n"))
+    (println (str "[HEAD MODEL] Top_P outputs: \n"
+                  (->> tokenized-input
+                       (top-p-output tensorflow-head-model max-length)
+                       decode-sequence
+                       (string/join "\n"))
+                  "\n"))
+    (println (str "[DOUBLE HEAD MODEL] Top_P outputs: \n"
+                  (->> tokenized-input
+                       (top-p-output tensorflow-double-head-model max-length)
+                       decode-sequence
+                       (string/join "\n"))
+                  "\n"))))

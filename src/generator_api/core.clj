@@ -1,5 +1,6 @@
 (ns generator-api.core
-  (:require muuntaja.core
+  (:require [generator-api.generator :as generator]
+            muuntaja.core
             ring.middleware.params
             reitit.coercion
             reitit.coercion.spec
@@ -13,62 +14,44 @@
             ring.middleware.cors)
   (:gen-class))
 
-(def healthcheck-resource
+(defn healthcheck-resource
+  [components]
   {:name :resources/healthcheck
    :get  {:handler (constantly
                      {:status 200
                       :body   {:status "OK"}})}})
 
-(def recommendations-resource
-  {:name    :resources/recommentations
-   :get     {:summary    "Get a user's content recommendations"
-             :parameters {:path {:user-id int?}}
-             :handler    (fn [request]
-                           {:status 200
-                            :body   {:items ()}})}
-   :options {:no-doc  true
+(defn generator-resource
+  [{:keys [model-zoo]}]
+  {:name :resources/generators
+   :get {:summary "Get a list of available generators"
+         :handler (fn [_]
+                    {:status 200
+                     :body {:items (keys model-zoo)
+                            :total (count model-zoo)}})}
+   :post {:summary    "Generate something with given paramters"
+          :parameters {:body {:model string?
+                              :input string?}}
+          :handler (fn [{{{:keys [model input options]} :body} :parameters}]
+                     (if-let [found-model (get model-zoo (keyword model))]
+                       {:status 200
+                        :body {:input input
+                               :output (map #(re-matches #".+[.!?]")
+                                            (generator/generate found-model input options))}}
+                       {:status 404}))}
+   :options {:no-doc true
              :handler (constantly {:status 200})}})
 
-(defn learner-representation-resource
-  [{storage :storage}]
-  {:name       :resources/learner-representation
-   :parameters {:path {:user-id string?}}
-   :get        {:summary "Get a user's learner representation"
-                :handler (fn [{:keys [parameters]}]
-                           (let [user-id (get-in parameters [:path :user-id])]
-                             {:status 200
-                              :body   {}}))}
-   :options    {:no-doc  true
-                :handler (constantly {:status 200})}})
-
-(defn events-resource
-  [{event-processor :event-processor}]
-  {:name    :resources/events
-   :get     {:summary    "Get generated events"
-             :parameters {:query {:user-id    string?
-                                  :event-type string?}}
-             :handler    (fn [{{{:keys [user-id event-type]} :query} :parameters}]
-                           {:status 200
-                            :body   {}})}
-   :post    {:summary    "Send an event as on behalf of a user"
-             :parameters {:body {:event-data map?}}
-             :response   {200 {:body {:event-response map?}}}
-             :handler    (fn [{{{:keys [event-data]} :body} :parameters}]
-                           {:status 200
-                            :body   {:event-response {}}})}
-   :options {:no-doc  true
-             :handler (constantly {:status 200})}})
+(comment
+  (re-matches #".+\[.!?\]" "Write a short story about the day that we all started to lose our minds.\n\nWe've"))
 
 (defn root-handler
   [components]
   (reitit.ring/ring-handler
     (reitit.ring/router
-      [["/healthcheck" healthcheck-resource]
+     [["/healthcheck" (healthcheck-resource components)]
        ["/api/v1"
-        ["/users/:user-id/recommendations" recommendations-resource]
-        ["/users/:user-id/representation" (learner-representation-resource components)]]
-       ["/dev"
-        ["/events" (events-resource components)]]
+        ["/generators" (generator-resource components)]]
        ["" {:no-doc true}
         ["/swagger.json" {:get (reitit.swagger/create-swagger-handler)}]
         ["/api-docs/*" {:get (reitit.swagger-ui/create-swagger-ui-handler)}]
@@ -96,13 +79,18 @@
 
 (defn create-components
   []
-  {:storage (atom {})})
+  (let [tokenizer (generator/create-tokenizer)]
+    {:storage (atom {})
+     :tokenizer tokenizer
+     :model-zoo {:buddy.v1 (generator/create-generator-buddy.v1 tokenizer)}}))
+
+(defonce components (create-components))
 
 (defn start-server
   [port]
   (stop-server)
   (reset! server-instance
-          (ring-jetty/run-jetty (root-handler (create-components))
+          (ring-jetty/run-jetty (root-handler components)
                                 {:port  port
                                  :join? false})))
 
@@ -115,6 +103,5 @@
 
 (comment
   ;; start the server from within an nrepl session
-  (prn @server-instance)
   (stop-server)
   (start-server 9000))
