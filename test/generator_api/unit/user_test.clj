@@ -1,6 +1,6 @@
-(ns voila-api.unit.user-test
+(ns hack-week-generator-api.unit.user-test
   (:require [clojure.test :refer :all]
-            [voila-api.users :as users]))
+            [hack-week-generator-api.users :as users]))
 
 (deftest user-unit-tests
   (let [test-users (users/generate-users 100)]

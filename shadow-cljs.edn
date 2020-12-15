@@ -6,9 +6,9 @@
  :dev-http {9010 "public"}
 
  :builds {:introspect {:target :browser
-                       :modules {:main {:init-fn voila-introspect.main/init}}
+                       :modules {:main {:init-fn generator-client.main/init}}
                        :js-options {:js-provider :external
                                     :external-index "target/index.js"}
-                       :devtools {:before-load voila-introspect.main/stop
-                                  :after-load voila-introspect.main/start}
-                       :dev {:closure-defines {voila-introspect.main/api-root "http://localhost:9000"}}}}}
+                       :devtools {:before-load generator-client.main/stop
+                                  :after-load generator-client.main/start}
+                       :dev {:closure-defines {generator-client.main/api-root "http://localhost:9000"}}}}}

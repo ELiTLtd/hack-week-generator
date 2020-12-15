@@ -1,15 +1,15 @@
-# voila
+# hack-week-generator
 
-![Testing](https://github.com/ELiTLtd/voila/workflows/Testing/badge.svg)
+![Testing](https://github.com/ELiTLtd/hack-week-generator/workflows/Testing/badge.svg)
 
 Contains clojure source code which comprises the following assets:
 
-- `voila-api` - a web service that provides recommendations and representations for learners
-- `voila-introspect` - a single page application that can be used to interrogate the voila-api
-- _`voila-microapp` - a (potential) single page application that integrates with Cambridge One_
+- `hack-week-generator-api` - a web service that provides recommendations and representations for learners
+- `hack-week-generator-introspect` - a single page application that can be used to interrogate the voila-api
+- _`hack-week-generator-microapp` - a (potential) single page application that integrates with Cambridge One_
 
-Currently we host the `voila-introspect` web app under `/internal/app` of the
-`voila-api` although it's a goal of the project to have all three elements be
+Currently we host the `hack-week-generator-introspect` web app under `/internal/app` of the
+`hack-week-generator-api` although it's a goal of the project to have all three elements be
 highly decoupled.
 
 Contains [terraform](https://www.terraform.io/) configuration for managing other
@@ -32,11 +32,11 @@ Deployment](#continuous-deployment) here
 
 ### MacOS
 
-For developing the `voila-api` service:
+For developing the `hack-week-generator-api` service:
 
     brew install leiningen
 
-For developing the `voila-introspect` webapp:
+For developing the `hack-week-generator-introspect` webapp:
 
     brew install npm
     npm install -g shadow-cljs
@@ -52,7 +52,7 @@ For deployment:
 
 ## Developing
 
-### `voila-api`
+### `hack-week-generator-api`
 
 You should be able to start a development repl with:
 
@@ -74,9 +74,9 @@ Libraries that are useful for understanding the service:
    Started](https://clojure.org/about/spec) - [API
    Docs](https://clojure.github.io/spec.alpha/)
 
-### `voila-introspect`
+### `hack-week-generator-introspect`
 
-For `voila-introspect` we're building our application using
+For `hack-week-generator-introspect` we're building our application using
 [shadow-cljs](http://shadow-cljs.org/), creating a [react](https://reactjs.org/)
 frontend with [reagent](http://reagent-project.github.io/) and taking advantage
 of the excellent [evergreen](https://evergreen.segment.com/) component/UI react
@@ -104,9 +104,9 @@ And then in a separate, terminal window run this:
 
 See the section on [Continuous Integration](#continuous-integration)
 
-### `voila-api`
+### `hack-week-generator-api`
 
-You can run the tests for voila-api with
+You can run the tests for hack-week-generator-api with
 
     lein test
 
@@ -115,7 +115,7 @@ You can run the tests for voila-api with
 _See the section on [Continuous Deployment](#continuous-deployment)_
 
 We use [aws-copilot](https://github.com/aws/copilot-cli) to deploy new versions
-of the voila-api. It currently depends on building and sending a docker image
+of the hack-week-generator-api. It currently depends on building and sending a docker image
 based on the current dockerfile in the repository deploying with:
 
     copilot svc deploy # detailed configuration can be found at `scripts/deploy.sh`
@@ -123,7 +123,7 @@ based on the current dockerfile in the repository deploying with:
 ## Infrastructure
 
 We use [aws-copilot](https://github.com/aws/copilot-cli) to manage
-infrastructure for running `voila-api`. By convention it is running on [AWS
+infrastructure for running `hack-week-generator-api`. By convention it is running on [AWS
 Fargate](https://aws.amazon.com/fargate/) via [AWS
 ECS](https://aws.amazon.com/ecs/).
 
@@ -138,4 +138,4 @@ and deploy software.
 ## Continuous Deployment
 
 When you push to or merge changes into master [an action will automatically
-release and deploy](https://github.com/ELiTLtd/voila/actions?query=workflow%3ARelease) a new version.
+release and deploy](https://github.com/ELiTLtd/hack-week-generator/actions?query=workflow%3ARelease) a new version.

@@ -1,9 +1,9 @@
-(ns voila-api.acceptance.core-test
+(ns hack-week-generator-api.acceptance.core-test
   (:require [clojure.test :refer :all]
             [jsonista.core :as json]
             [muuntaja.core :as muuntaja]
             [ring.mock.request :as ring-mock]
-            [voila-api.acceptance.common :as common]))
+            [hack-week-generator-api.acceptance.common :as common]))
 
 (deftest a-test
   (testing "And it's fixed"

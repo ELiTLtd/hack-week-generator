@@ -1,4 +1,4 @@
-(ns voila-api.core
+(ns generator-api.core
   (:require muuntaja.core
             ring.middleware.params
             reitit.coercion
@@ -10,11 +10,7 @@
             reitit.swagger
             reitit.swagger-ui
             [ring.adapter.jetty :as ring-jetty]
-            ring.middleware.cors
-            [voila-api.events :as events]
-            [voila-api.users :as users]
-            [voila-api.event-processor :as event-processor]
-            [voila-api.learner-representation :as learner-representation])
+            ring.middleware.cors)
   (:gen-class))
 
 (def healthcheck-resource
@@ -29,7 +25,7 @@
              :parameters {:path {:user-id int?}}
              :handler    (fn [request]
                            {:status 200
-                            :body   {:items (repeatedly 10 #(voila-api.content/generate-content))}})}
+                            :body   {:items ()}})}
    :options {:no-doc  true
              :handler (constantly {:status 200})}})
 
@@ -41,7 +37,7 @@
                 :handler (fn [{:keys [parameters]}]
                            (let [user-id (get-in parameters [:path :user-id])]
                              {:status 200
-                              :body   (learner-representation/retrieve storage [user-id])}))}
+                              :body   {}}))}
    :options    {:no-doc  true
                 :handler (constantly {:status 200})}})
 
@@ -52,24 +48,14 @@
              :parameters {:query {:user-id    string?
                                   :event-type string?}}
              :handler    (fn [{{{:keys [user-id event-type]} :query} :parameters}]
-                           (let [event (events/generate-event-from-data
-                                         {:actor-global-id user-id
-                                          :actor-local-id  user-id
-                                          :verb            event-type})]
-                             (if event
-                               {:status 200
-                                :body   event}
-                               {:status 500})))}
+                           {:status 200
+                            :body   {}})}
    :post    {:summary    "Send an event as on behalf of a user"
              :parameters {:body {:event-data map?}}
              :response   {200 {:body {:event-response map?}}}
              :handler    (fn [{{{:keys [event-data]} :body} :parameters}]
-                           (let [event-response
-                                  (event-processor/process-data event-processor event-data)]
-                              (if event-response
-                                {:status 200
-                                 :body   {:event-response event-response}}
-                                {:status 500})))}
+                           {:status 200
+                            :body   {:event-response {}}})}
    :options {:no-doc  true
              :handler (constantly {:status 200})}})
 
@@ -110,8 +96,7 @@
 
 (defn create-components
   []
-  {:event-processor (event-processor/->DummyEventProcessor learner-representation/atomic-store)
-   :storage learner-representation/atomic-store})
+  {:storage (atom {})})
 
 (defn start-server
   [port]

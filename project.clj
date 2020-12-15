@@ -1,8 +1,9 @@
-(defproject voila "1.0.17-SNAPSHOT"
-  :description "ila-project prototype project"
-  :url "https://github.com/ELiTLtd/voila"
+(defproject hack-week-generator "1.0.17-SNAPSHOT"
+  :description "hack week question generator project"
+  :url "https://github.com/ELiTLtd/hack-week-generator"
   :min-lein-version "2.0.0"
   :dependencies [[clj-http "3.10.1"]
+                 [clj-python/libpython-clj "1.46"]
                  [metosin/muuntaja "0.6.7"]
                  [metosin/potpuri "0.5.2"]
                  [metosin/reitit "0.5.5"]
@@ -25,7 +26,7 @@
                                   [thheller/shadow-cljs "2.11.2"]
                                   [ring/ring-mock "0.4.0"]]}
              :uberjar {:aot :all
-                       :uberjar-name "voila-api-uberjar.jar"}}
+                       :uberjar-name "generator-api-uberjar.jar"}}
   :middleware [lein-git-down.plugin/inject-properties]
   :repositories [["public-github" {:url "git://github.com"}]
                  ["private-github" {:url "git://github.com"
@@ -43,5 +44,5 @@
                   ["change" "version" "leiningen.release/bump-version"]
                   ["vcs" "commit" "Version %s [skip ci]"]]
   :clean-targets [:target-path "public/js" ".shadow-cljs"]
-  :main ^:skip-aot voila-api.core
+  :main ^:skip-aot generator-api.core
   :target-path "target/%s")

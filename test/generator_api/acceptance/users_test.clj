@@ -1,8 +1,8 @@
-(ns voila-api.acceptance.users-test
+(ns hack-week-generator-api.acceptance.users-test
   (:require [clojure.test :refer :all]
             [jsonista.core :as json]
             [ring.mock.request :as ring-mock]
-            [voila-api.acceptance.common :as common]))
+            [hack-week-generator-api.acceptance.common :as common]))
 
 #_(deftest get-a-user
   (testing "all users return an OK response"

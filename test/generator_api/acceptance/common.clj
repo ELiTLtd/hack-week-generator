@@ -1,7 +1,7 @@
-(ns voila-api.acceptance.common
+(ns hack-week-generator-api.acceptance.common
   "Components and utilities required for running acceptance tests"
   (:require muuntaja.core
-            voila-api.core))
+            hack-week-generator-api.core))
 
 (def test-handler
   "Combines the root-handler (as a ref so it's dynamically invoked) and a muuntaja
@@ -15,4 +15,4 @@
               (assoc response :body decoded-body))
             (catch Exception _
               response)))
-        (voila-api.core/root-handler (voila-api.core/create-components))))
+        (hack-week-generator-api.core/root-handler (voila-api.core/create-components))))
