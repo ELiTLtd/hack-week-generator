@@ -11,7 +11,8 @@
             reitit.swagger
             reitit.swagger-ui
             [ring.adapter.jetty :as ring-jetty]
-            ring.middleware.cors)
+            ring.middleware.cors
+            [spec-tools.data-spec :as ds])
   (:gen-class))
 
 (defn healthcheck-resource
@@ -31,19 +32,20 @@
                             :total (count model-zoo)}})}
    :post {:summary    "Generate something with given paramters"
           :parameters {:body {:model string?
-                              :input string?}}
+                              :input string?
+                              (ds/opt :options) {(ds/opt :max_length) int?
+                                                 (ds/opt :top_k) int?
+                                                 (ds/opt :top_p) number?
+                                                 (ds/opt :temperature) number?
+                                                 (ds/opt :num_return_sequences) int?}}}
           :handler (fn [{{{:keys [model input options]} :body} :parameters}]
                      (if-let [found-model (get model-zoo (keyword model))]
                        {:status 200
                         :body {:input input
-                               :output (map #(re-matches #".+[.!?]")
-                                            (generator/generate found-model input options))}}
+                               :output (generator/generate found-model input options)}}
                        {:status 404}))}
    :options {:no-doc true
              :handler (constantly {:status 200})}})
-
-(comment
-  (re-matches #".+\[.!?\]" "Write a short story about the day that we all started to lose our minds.\n\nWe've"))
 
 (defn root-handler
   [components]

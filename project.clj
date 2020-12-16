@@ -2,7 +2,8 @@
   :description "hack week question generator project"
   :url "https://github.com/ELiTLtd/hack-week-generator"
   :min-lein-version "2.0.0"
-  :dependencies [[clj-http "3.10.1"]
+  :dependencies [[camel-snake-kebab "0.4.2"]
+                 [clj-http "3.10.1"]
                  [clj-python/libpython-clj "1.46"]
                  [metosin/muuntaja "0.6.7"]
                  [metosin/potpuri "0.5.2"]

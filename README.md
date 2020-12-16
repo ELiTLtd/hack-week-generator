@@ -94,7 +94,7 @@ First, make sure we have npm dependencies:
 
 Then trigger shadow-cljs to build us an index.js binding:
 
-    npx shadow-cljs watch introspect
+    npx shadow-cljs watch client
 
 And then in a separate, terminal window run this:
 
