@@ -1,7 +1,8 @@
 (ns generator-api.generator
   (:require [libpython-clj.require :refer [require-python]]
             [libpython-clj.python :as py :refer [py. py.. py.-]]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [clojure.string :as str]))
 
 (require-python 'tensorflow
                 'transformers)
@@ -40,3 +41,38 @@
    (py/$a transformers/TFGPT2LMHeadModel :from_pretrained
           "gpt2"
           :pad_token_id (py/$. tokenizer "eos_token_id"))))
+
+(defn create-bert-tokenizer
+  []
+  (py/$a transformers/AutoTokenizer :from_pretrained "distilbert-base-cased"))
+
+(defn create-bert-model
+  [tokenizer]
+  (py/$a transformers/TFAutoModelWithLMHead :from_pretrained
+          "distilbert-base-cased"
+          :pad_token_id (py/$. tokenizer "eos_token_id")))
+
+(defn predict
+  [model tokenizer text n]
+  (let [input-tokens (py/$a tokenizer :encode text :return_tensors "tf")
+        mask-token-id (py/$. tokenizer :mask_token_id)
+        mask-token-index (-> (py/$a input-tokens :__eq__ mask-token-id) tensorflow/where first second)
+        logits (py/$. (model input-tokens) :logits)
+        mask-token-logits (-> logits first (py/$a :__getitem__ [mask-token-index]))
+        top-n (-> (py/$a tensorflow/math :top_k mask-token-logits n) (py/$. :indices) vec)]
+    (for [word (take 5 (shuffle top-n))]
+      (println (.replace text (py/$. tokenizer :mask_token) (py/$a tokenizer :decode word))))))
+
+(comment
+
+  (def tokenizer (create-bert-tokenizer))
+  (def model (create-bert-model tokenizer))
+
+  (def text (str "Write a summary of your favourite "
+                 (py/$. tokenizer :mask_token)
+                 "."))
+
+
+  (predict model tokenizer text 30)
+
+  )
