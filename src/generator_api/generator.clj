@@ -28,7 +28,7 @@
                                 options)]
       (printf "Generating text for input [%s] with options %s\n" input merged-options)
       (pmap #(py/$a tokenizer :decode % :skip_special_tokens true)
-            (py/call-attr-kw tensorflow-head-model
+            (py/call-attr-kw model
                              :generate
                              [input-tokens]
                              merged-options)))))

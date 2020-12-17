@@ -1,9 +1,10 @@
 (ns generator-client.main
   (:require [ajax.core :as ajax]
+            [clojure.string :as string]
             ["evergreen-ui"
              :refer
              [Badge Pane Text TextInputField Strong Button SelectMenu Textarea
-             majorScale Heading Code UnorderedList ListItem default-theme
+             majorScale minorScale Heading Code UnorderedList ListItem default-theme
              Paragraph Spinner]]
             goog.object
             ["react" :as react]
@@ -15,7 +16,8 @@
 
 (defonce state
   (reagent/atom
-   {:input nil
+   {:input-updated 1
+    :input ""
     :results nil
     :options nil
     :time-taken nil
@@ -88,11 +90,11 @@
   (.log js/console (str "something bad happened: " status " " status-text)))
 
 (def default-model-options
-  {:max_length 40
+  {:add_words 3
    :top_k 50
    :top_p 0.9
    :temperature 1.0
-   :num_return_sequences 5})
+   :num_return_sequences 10})
 
 (defn model-option
   [{:keys [label key coercer-fn] :as opts}]
@@ -106,6 +108,43 @@
                                  coercer-fn)]
                    (swap! state assoc-in [:options key] value)))}])
 
+(defn generate-text []
+  (if-let [input (:input @state)]
+    (let [max-length (+ (get-in @state [:options :add_words] (:add_words default-model-options)) (count (string/split input " ")))
+          options (merge default-model-options (:options @state) {:max_length max-length})]
+      (swap! state assoc
+             :results :loading
+             :time-taken nil
+             :request-start (js/Date.now))
+      (ajax/POST (api "/generators")
+                 {:format :json
+                  :response-format :json
+                  :params {:model "buddy.v1"
+                           :input input
+                           :options options}
+                  :handler (fn [response]
+                             (swap! state assoc :results (get response "output"))
+                             (swap! state assoc :time-taken (- (js/Date.now) (:request-start @state))))
+                  :error-handler error-handler}))))
+
+(defn input-text-area
+  [state]
+  ^{:key (:input-update @state)}
+  [:> Textarea
+   {:flex-grow 4
+    :placeholder "Write an exam question stem..."
+    :value (:input @state)
+    :on-change (fn [event]
+                 (swap! state assoc :input (-> event .-target .-value)))
+    :on-key-press (fn [e]
+                    (.preventDefault e)
+                    (if (= 13 (.-charCode e))
+                      (generate-text)))}])
+
+(defn active-example?
+  [state example]
+  (= example (get-in @state [:active-result])))
+
 (defn text-generation
   [state]
   [:> Pane
@@ -115,15 +154,10 @@
            :flex-direction :column
            :padding        (majorScale 3)
            :margin         (majorScale 2)})
-   [:> Textarea
-    {:flex-grow   4
-     :placeholder "Write an exam question stem..."
-     :default-value (:input @state)
-     :on-change (fn [event]
-                  (swap! state assoc :input (-> event .-target .-value)))}]
+   [input-text-area state]
    [:> Pane
-    [model-option {:label "Max Length"
-                   :key :max_length
+    [model-option {:label "Add Words"
+                   :key :add_words
                    :coercer-fn js/parseInt}]
     [model-option {:label "Top K"
                    :key :top_k
@@ -145,33 +179,31 @@
     [:> Button
      {:flex-grow 1
       :justify-content :center
-      :on-click (fn []
-                  (if-let [input (:input @state)]
-                    (let [options (merge default-model-options (:options @state))]
-                      (swap! state assoc
-                             :results :loading
-                             :time-taken nil
-                             :request-start (js/Date.now))
-                      (ajax/POST (api "/generators")
-                          {:format :json
-                           :response-format :json
-                           :params {:model "buddy.v1"
-                                    :input input
-                                    :options options}
-                           :handler (fn [response]
-                                      (swap! state assoc :results (get response "output"))
-                                      (swap! state assoc :time-taken (- (js/Date.now) (:request-start @state))))
-                           :error-handler error-handler}))))}
+      :on-click generate-text}
      "Generate Examples"]]
    (if (= :loading (:results @state))
      [:> Spinner {:margin-x :auto :margin-y (majorScale 2)}]
-     (for [example (:results @state)]
-       ^{:key example}
-       [:> Paragraph {:flex-direction :row
-                      :margin-top (majorScale 1)
-                      :padding (majorScale 1)} example]))
+     (doall
+      (for [example (distinct (:results @state))]
+        ^{:key example}
+        [:> Pane {:elevation (if (active-example? state example) 2 0)
+                  :flex-direction :row
+                  :margin-top (majorScale 1)
+                  :padding (majorScale 1)
+                  :border-width 1
+                  :border-color "#DDEBF7"
+                  :border-style "solid"
+                  :background-color (if (active-example? state example) "#DDEBF7" "white")
+                  :on-mouse-enter (fn [] (swap! state assoc :active-result example))
+                  :on-mouse-leave (fn [] (swap! state dissoc :active-result))
+                  :on-click (fn [event]
+                              (swap! state assoc :input example :results nil :time-taken nil)
+                              (swap! state update :input-updated inc))}
+         [:> Paragraph example]])))
    (when-let [time-taken (:time-taken @state)]
-     [:> Paragraph (str "Time taken: " time-taken "ms")])])
+     [:> Paragraph {:margin-top (majorScale 1)
+                    :padding (minorScale 1)}
+      (str "Time taken: " time-taken "ms")])])
 
 (defn app
   []
