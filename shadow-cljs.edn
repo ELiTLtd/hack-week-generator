@@ -1,7 +1,8 @@
 {:source-paths ["src"]
 
- :dependencies [[reagent "0.10.0" :exclusions [cljsjs/react cljsjs/react-dom]]
-                [cljs-ajax "0.8.1"]]
+ :dependencies [[cljs-ajax "0.8.1"]
+                [cljs-bean "1.6.0"]
+                [reagent "0.10.0" :exclusions [cljsjs/react cljsjs/react-dom]]]
 
  :dev-http {9010 "public"}
 

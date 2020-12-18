@@ -33,7 +33,8 @@
    :post {:summary    "Generate something with given paramters"
           :parameters {:body {:model string?
                               :input string?
-                              (ds/opt :options) {(ds/opt :max_length) int?
+                              (ds/opt :options) {(ds/opt :sample_size) int?
+                                                 (ds/opt :max_length) int?
                                                  (ds/opt :top_k) int?
                                                  (ds/opt :top_p) number?
                                                  (ds/opt :temperature) number?
@@ -84,7 +85,8 @@
   (let [tokenizer (generator/create-tokenizer)]
     {:storage (atom {})
      :tokenizer tokenizer
-     :model-zoo {:buddy.v1 (generator/create-generator-buddy.v1 tokenizer)}}))
+     :model-zoo {:buddy.v1 (generator/create-generator-buddy-v1)
+                 :macaulay.v1 (generator/create-generator-macaulay-v1)}}))
 
 (defonce components (create-components))
 
@@ -107,3 +109,8 @@
   ;; start the server from within an nrepl session
   (stop-server)
   (start-server 9000))
+
+(comment
+  (time
+   (def components (create-components))
+   (start-server 9000))  )

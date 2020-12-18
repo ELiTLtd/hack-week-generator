@@ -1,5 +1,6 @@
 (ns generator-client.main
   (:require [ajax.core :as ajax]
+            [cljs-bean.core :refer [bean ->js ->clj]]
             [clojure.string :as string]
             ["evergreen-ui"
              :refer
@@ -38,19 +39,19 @@
 (defn major-pane
   [{:keys [title] :as props} & children]
   (into [:> Pane
-         (merge {:height         (majorScale 60)
-                 :min-height     (majorScale 40)
-                 :width          (majorScale 90)
-                 :border         :default
-                 :display        :flex
+         (merge {:height (majorScale 60)
+                 :min-height (majorScale 40)
+                 :width (majorScale 90)
+                 :border :none
+                 :display :flex
                  :flex-direction :column
-                 :padding        (majorScale 3)
-                 :margin         (majorScale 2)}
+                 :padding (majorScale 3)
+                 :margin (majorScale 2)}
                 (dissoc props :title))]
         (cond-> children
                 title (conj [:> Heading
-                             {:size          600
-                              :margin-top    0
+                             {:size 600
+                              :margin-top 0
                               :margin-bottom (majorScale 2)}
                              title]))))
 
@@ -63,26 +64,26 @@
   (let [first-char-n (mod (.charCodeAt text) (count badge-colors))
         color (nth badge-colors first-char-n)]
     [:> Badge {:margin-right (majorScale 1)
-               :color        color}
+               :color color}
      text]))
 
 (defn event-select
   [{:keys [selected-event-type on-select-event event-types] :as props} & children]
   (into [:> SelectMenu
-         {:title           "Select Event Type"
-          :options         event-types
-          :selected        (:value selected-event-type)
-          :on-select       (fn [item]
-                             (-> item
-                                 (js->clj :keywordize-keys true)
-                                 on-select-event))
+         {:title "Select Event Type"
+          :options event-types
+          :selected (:value selected-event-type)
+          :on-select (fn [item]
+                       (-> item
+                           (js->clj :keywordize-keys true)
+                           on-select-event))
           :close-on-select true}]
         (if (not-empty children)
           children
           [[:> Button
-            {:flex-grow       1
+            {:flex-grow 1
              :justify-content :center
-             :margin-right    (majorScale 1)}
+             :margin-right (majorScale 1)}
             (or (:label selected-event-type)
                 "Select an event type...")]])))
 
@@ -108,38 +109,39 @@
                                  coercer-fn)]
                    (swap! state assoc-in [:options key] value)))}])
 
-(defn generate-text []
-  (if-let [input (:input @state)]
-    (let [max-length (+ (get-in @state [:options :add_words] (:add_words default-model-options)) (count (string/split input " ")))
-          options (merge default-model-options (:options @state) {:max_length max-length})]
-      (swap! state assoc
-             :results :loading
-             :time-taken nil
-             :request-start (js/Date.now))
-      (ajax/POST (api "/generators")
-                 {:format :json
-                  :response-format :json
-                  :params {:model "buddy.v1"
-                           :input input
-                           :options options}
-                  :handler (fn [response]
-                             (swap! state assoc :results (get response "output"))
-                             (swap! state assoc :time-taken (- (js/Date.now) (:request-start @state))))
-                  :error-handler error-handler}))))
+(defn generate-text
+  [type]
+  (fn []
+    (if-let [input (:input @state)]
+      (let [max-length (+ (get-in @state [:options :add_words] (:add_words default-model-options))
+                          (count (string/split input " ")))
+            options (merge default-model-options (:options @state) {:max_length max-length})]
+        (swap! state assoc
+               :results :loading
+               :time-taken nil
+               :request-start (js/Date.now))
+        (ajax/POST (api "/generators")
+            {:format :json
+             :response-format :json
+             :params {:model (if (= :extend type) "buddy.v1" "macaulay.v1")
+                      :input input
+                      :options (if (= :extend type) options
+                                   {:top_k 50
+                                    :sample_size 10})}
+             :handler (fn [response]
+                        (swap! state assoc :results (get response "output"))
+                        (swap! state assoc :time-taken (- (js/Date.now) (:request-start @state))))
+             :error-handler error-handler})))))
 
 (defn input-text-area
   [state]
-  ^{:key (:input-update @state)}
+  ^{:key (:input @state)}
   [:> Textarea
    {:flex-grow 4
     :placeholder "Write an exam question stem..."
-    :value (:input @state)
-    :on-change (fn [event]
-                 (swap! state assoc :input (-> event .-target .-value)))
-    :on-key-press (fn [e]
-                    (.preventDefault e)
-                    (if (= 13 (.-charCode e))
-                      (generate-text)))}])
+    :default-value (:input @state)
+    :on-blur (fn [event]
+               (swap! state assoc :input (-> event .-target .-value)))}])
 
 (defn active-example?
   [state example]
@@ -179,8 +181,13 @@
     [:> Button
      {:flex-grow 1
       :justify-content :center
-      :on-click generate-text}
-     "Generate Examples"]]
+      :on-click (generate-text :extend)}
+     "Extend (Ctrl-E)"]
+    [:> Button
+     {:flex-grow 1
+      :justify-content :center
+      :on-click (generate-text :replace)}
+     "Replace (Ctrl-R)"]]
    (if (= :loading (:results @state))
      [:> Spinner {:margin-x :auto :margin-y (majorScale 2)}]
      (doall
@@ -206,7 +213,7 @@
       (str "Time taken: " time-taken "ms")])])
 
 (defn app
-  []
+  [state]
   [:> Pane {:margin (majorScale -1)}
    [:> Pane {:height (majorScale 7)
              :min-height 56
@@ -232,9 +239,42 @@
 (defn start
   []
   (js/console.log "Starting...")
-  (reagent.dom/render [app]
-                      (js/document.getElementById "root")))
+  (reagent.dom/render [app state]
+                      (js/document.getElementById "root"))
+  (set! (.-onkeydown js/document)
+        (fn [event]
+          (let [key-map {{:ctrl true
+                          :key "e"}
+                         (fn []
+                           ((generate-text :extend)))
+                         {:ctrl true
+                          :key "r"}
+                         (fn []
+                           ((generate-text :replace)))}]
+            (when-let [key-action (key-map {:ctrl (.-ctrlKey event)
+                                            :key (.-key event)})]
+              (.preventDefault event)
+              (key-action))))))
 
 (defn ^:export init
   []
   (start))
+
+
+(comment
+  (set! (.-onkeydown js/document)
+        (fn [event]
+          #p (bean event)
+          (let [key-map {{:ctrl true
+                          :key "e"}
+                         (fn []
+                           ((generate-text :extend)))
+                         {:ctrl true
+                          :key "r"}
+                         (fn []
+                           ((generate-text :replace)))}]
+            (when-let [key-action (key-map {:ctrl (.-ctrlKey event)
+                                            :key (.-key event)})]
+              (.preventDefault event)
+              (key-action)))))
+  )
